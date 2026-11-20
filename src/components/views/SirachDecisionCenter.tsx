@@ -25,11 +25,27 @@ export const SirachDecisionCenter: React.FC = () => {
     sirachDecisions,
     approveRequest,
     approvalRequests,
-    openGuidedDemo
+    openGuidedDemo,
+    selectedSite
   } = useApp();
 
   const navigate = useNavigate();
   const [activeDecisionKey, setActiveDecisionKey] = useState<string>('SIR-DEC-104');
+
+  // Auto-switch decision when selectedSite changes
+  React.useEffect(() => {
+    if (selectedSite === 'water-station-7') {
+      setActiveDecisionKey('SIR-DEC-W701');
+      setSelectedOptionId('C');
+    } else if (selectedSite === 'fulfillment-3') {
+      setActiveDecisionKey('SIR-DEC-F301');
+      setSelectedOptionId('B');
+    } else if (selectedSite === 'riverside') {
+      setActiveDecisionKey('SIR-DEC-104');
+      setSelectedOptionId('C');
+    }
+  }, [selectedSite]);
+
   const decision = sirachDecisions[activeDecisionKey] || sirachDecisions['SIR-DEC-104'];
   const [selectedOptionId, setSelectedOptionId] = useState<'A' | 'B' | 'C' | 'D'>('C');
 

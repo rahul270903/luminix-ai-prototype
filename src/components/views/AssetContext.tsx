@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
-import { Asset } from '../../types';
+import { Asset, SiteId } from '../../types';
 import {
   Cpu,
   Search,
@@ -13,26 +13,40 @@ import {
   ShieldCheck,
   User,
   Clock,
-  Sparkles
+  Sparkles,
+  Building2
 } from 'lucide-react';
 import { TrustScoreBadge } from '../common/Badge';
 
 export const AssetContext: React.FC = () => {
-  const { assets } = useApp();
+  const { assets, selectedSite, setSelectedSite, showToast } = useApp();
   const [search, setSearch] = useState('');
   const [selectedAssetId, setSelectedAssetId] = useState<string>('P-104');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [filterBySite, setFilterBySite] = useState<boolean>(true);
+
+  // Auto-select relevant asset when selectedSite changes
+  useEffect(() => {
+    if (selectedSite === 'water-station-7') {
+      setSelectedAssetId('W-PUMP-701');
+    } else if (selectedSite === 'fulfillment-3') {
+      setSelectedAssetId('SRT-301');
+    } else if (selectedSite === 'riverside') {
+      setSelectedAssetId('P-104');
+    }
+  }, [selectedSite]);
 
   const filteredAssets = assets.filter(a => {
+    const matchesSite = !filterBySite || selectedSite === 'all' || a.siteId === selectedSite;
     const matchesSearch =
       a.name.toLowerCase().includes(search.toLowerCase()) ||
       a.code.toLowerCase().includes(search.toLowerCase()) ||
       a.line.toLowerCase().includes(search.toLowerCase());
     const matchesCat = selectedCategory === 'all' || a.category === selectedCategory;
-    return matchesSearch && matchesCat;
+    return matchesSite && matchesSearch && matchesCat;
   });
 
-  const selectedAsset = assets.find(a => a.id === selectedAssetId) || assets[0];
+  const selectedAsset = assets.find(a => a.id === selectedAssetId) || filteredAssets[0] || assets[0];
 
   return (
     <div className="space-y-6 pb-12">
@@ -59,15 +73,32 @@ export const AssetContext: React.FC = () => {
         {/* Left Column: Asset Directory (2 Cols) */}
         <div className="lg:col-span-2 space-y-4">
           <div className="flex items-center justify-between gap-3 flex-wrap">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Search asset, code, line..."
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                className="w-full pl-8 pr-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-navy-900 focus:outline-none focus:ring-1 focus:ring-primary shadow-2xs"
-              />
+            <div className="flex items-center gap-2 flex-1 max-w-md">
+              <div className="relative flex-1">
+                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search asset, code, line..."
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  className="w-full pl-8 pr-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-navy-900 focus:outline-none focus:ring-1 focus:ring-primary shadow-2xs"
+                />
+              </div>
+
+              {selectedSite !== 'all' && (
+                <button
+                  onClick={() => setFilterBySite(!filterBySite)}
+                  className={`px-2.5 py-1.5 rounded-lg text-xs font-medium border flex items-center gap-1.5 transition whitespace-nowrap ${
+                    filterBySite
+                      ? 'bg-navy-900 text-white border-navy-900'
+                      : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                  }`}
+                  title="Toggle filtering assets by the currently selected facility"
+                >
+                  <Building2 className="w-3.5 h-3.5" />
+                  <span>{filterBySite ? 'Facility Scoped' : 'All Sites'}</span>
+                </button>
+              )}
             </div>
 
             <select

@@ -24,7 +24,10 @@ import {
   Line
 } from 'recharts';
 
+import { useApp } from '../../context/AppContext';
+
 export const OperationalKPIs: React.FC = () => {
+  const { selectedSite, timeRange } = useApp();
   const [selectedKpi, setSelectedKpi] = useState('oee');
 
   const benchmarkData = [

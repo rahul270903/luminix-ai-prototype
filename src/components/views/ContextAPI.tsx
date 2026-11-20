@@ -14,13 +14,23 @@ import {
 } from 'lucide-react';
 
 export const ContextAPI: React.FC = () => {
-  const { assets, showToast } = useApp();
+  const { assets, showToast, selectedSite } = useApp();
 
   const [assetId, setAssetId] = useState('P-104');
   const [callerApp, setCallerApp] = useState('sirach');
   const [userRole, setUserRole] = useState('coo');
   const [isLoading, setIsLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  React.useEffect(() => {
+    if (selectedSite === 'water-station-7') {
+      setAssetId('W-PUMP-701');
+    } else if (selectedSite === 'fulfillment-3') {
+      setAssetId('SRT-301');
+    } else if (selectedSite === 'riverside') {
+      setAssetId('P-104');
+    }
+  }, [selectedSite]);
 
   const [response, setResponse] = useState<any>({
     status: 200,

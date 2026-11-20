@@ -19,17 +19,25 @@ import { TrustScoreBadge } from '../common/Badge';
 import { Modal } from '../common/Modal';
 
 export const DataSources: React.FC = () => {
-  const { dataSources, simulateIncomingData } = useApp();
+  const { dataSources, simulateIncomingData, selectedSite } = useApp();
   const [search, setSearch] = useState('');
   const [selectedProtocol, setSelectedProtocol] = useState('all');
   const [inspectSource, setInspectSource] = useState<DataSourceItem | null>(null);
+  const [filterBySite, setFilterBySite] = useState<boolean>(true);
+
+  const siteNameMap: Record<string, string> = {
+    'riverside': 'Riverside Plant',
+    'water-station-7': 'Water Utility – Station 7',
+    'fulfillment-3': 'Fulfillment Center – Site 3'
+  };
 
   const filteredSources = dataSources.filter(src => {
+    const matchesSite = !filterBySite || selectedSite === 'all' || src.site === siteNameMap[selectedSite];
     const matchesSearch =
       src.name.toLowerCase().includes(search.toLowerCase()) ||
       src.site.toLowerCase().includes(search.toLowerCase());
     const matchesProto = selectedProtocol === 'all' || src.protocol === selectedProtocol;
-    return matchesSearch && matchesProto;
+    return matchesSite && matchesSearch && matchesProto;
   });
 
   return (
@@ -63,7 +71,7 @@ export const DataSources: React.FC = () => {
       {/* Filter and Search Bar */}
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-2 flex-1 max-w-md">
-          <div className="relative w-full">
+          <div className="relative flex-1">
             <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
@@ -73,6 +81,19 @@ export const DataSources: React.FC = () => {
               className="w-full pl-8 pr-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-navy-900 focus:outline-none focus:ring-1 focus:ring-primary shadow-2xs"
             />
           </div>
+
+          {selectedSite !== 'all' && (
+            <button
+              onClick={() => setFilterBySite(!filterBySite)}
+              className={`px-2.5 py-1.5 rounded-lg text-xs font-medium border flex items-center gap-1.5 transition whitespace-nowrap ${
+                filterBySite
+                  ? 'bg-navy-900 text-white border-navy-900'
+                  : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+              }`}
+            >
+              <span>{filterBySite ? 'Facility Scoped' : 'All Sites'}</span>
+            </button>
+          )}
         </div>
 
         <div className="flex items-center gap-2">

@@ -29,13 +29,44 @@ export const Header: React.FC = () => {
     notifications,
     markAllNotificationsRead,
     autonomyLevel,
-    setAutonomyLevel
+    setAutonomyLevel,
+    showToast
   } = useApp();
 
   const [showNotifications, setShowNotifications] = useState(false);
   const [showSiteDropdown, setShowSiteDropdown] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showAutonomyMenu, setShowAutonomyMenu] = useState(false);
+
+  const closeAllMenus = () => {
+    setShowNotifications(false);
+    setShowSiteDropdown(false);
+    setShowProfileMenu(false);
+    setShowAutonomyMenu(false);
+  };
+
+  const handleSiteSelect = (siteId: SiteId) => {
+    setSelectedSite(siteId);
+    setShowSiteDropdown(false);
+    const siteNames: Record<SiteId, string> = {
+      'all': 'All Facilities (Fleet Overview)',
+      'riverside': 'Riverside Plant (Columbus, OH)',
+      'water-station-7': 'Water Utility – Station 7 (Austin, TX)',
+      'fulfillment-3': 'Fulfillment Center – Site 3 (Allentown, PA)'
+    };
+    showToast(`Active Facility switched to: ${siteNames[siteId]}`, 'info');
+  };
+
+  const handleTimeRangeSelect = (tr: '1h' | '24h' | '7d' | '30d') => {
+    setTimeRange(tr);
+    const rangeLabels: Record<string, string> = {
+      '1h': '1 Hour (Real-Time)',
+      '24h': '24 Hours (Day Shift)',
+      '7d': '7 Days (Weekly View)',
+      '30d': '30 Days (Governed Monthly)'
+    };
+    showToast(`Time window updated to: ${rangeLabels[tr]}`, 'info');
+  };
 
   const location = useLocation();
 
@@ -72,6 +103,14 @@ export const Header: React.FC = () => {
 
   return (
     <header className="sticky top-0 z-30 bg-white border-b border-surface-border shadow-xs">
+      {/* Global Transparent Backdrop for Dismissing Open Menus */}
+      {(showSiteDropdown || showNotifications || showProfileMenu || showAutonomyMenu) && (
+        <div
+          className="fixed inset-0 z-30 bg-black/5"
+          onClick={closeAllMenus}
+        />
+      )}
+
       {/* Top Notification / Demo Banner */}
       <div className="bg-navy-950 text-slate-300 text-[11px] px-4 py-1.5 flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -185,10 +224,7 @@ export const Header: React.FC = () => {
                   Select Active Facility
                 </div>
                 <button
-                  onClick={() => {
-                    setSelectedSite('all');
-                    setShowSiteDropdown(false);
-                  }}
+                  onClick={() => handleSiteSelect('all')}
                   className={`w-full flex items-center justify-between px-2.5 py-2 rounded-md text-xs text-left transition ${
                     selectedSite === 'all' ? 'bg-primary-light font-bold text-primary-dark' : 'hover:bg-slate-50'
                   }`}
@@ -202,10 +238,7 @@ export const Header: React.FC = () => {
                 {SITES.map(s => (
                   <button
                     key={s.id}
-                    onClick={() => {
-                      setSelectedSite(s.id as SiteId);
-                      setShowSiteDropdown(false);
-                    }}
+                    onClick={() => handleSiteSelect(s.id as SiteId)}
                     className={`w-full flex items-center justify-between px-2.5 py-2 rounded-md text-xs text-left transition ${
                       selectedSite === s.id ? 'bg-primary-light font-bold text-primary-dark' : 'hover:bg-slate-50'
                     }`}
@@ -226,7 +259,7 @@ export const Header: React.FC = () => {
             {(['1h', '24h', '7d', '30d'] as const).map(tr => (
               <button
                 key={tr}
-                onClick={() => setTimeRange(tr)}
+                onClick={() => handleTimeRangeSelect(tr)}
                 className={`px-2 py-1 text-xs font-medium rounded-md transition ${
                   timeRange === tr
                     ? 'bg-white text-navy-900 shadow-2xs font-semibold'

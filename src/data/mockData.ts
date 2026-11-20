@@ -559,6 +559,100 @@ export const ASSETS: Asset[] = [
         lastUpdated: '2s ago'
       }
     ]
+  },
+  {
+    id: 'W-PUMP-702',
+    name: 'Standby High-Lift Pump 702',
+    code: 'WST-P7-P702',
+    siteId: 'water-station-7',
+    area: 'Station 7 (Remote Pressure Hub)',
+    line: 'Trunk Line Delta',
+    category: 'Pump',
+    healthScore: 96,
+    healthStatus: 'optimal',
+    operatingHours: 3200,
+    criticality: 'A (High)',
+    owner: 'R. Davis',
+    limits: 'Discharge: 80 psi · Max Draw: 160 A',
+    maintenanceSchedule: 'Weekly automated test spin',
+    lastServiceDate: '2026-11-15',
+    sensors: [
+      {
+        id: 'sen-702-1',
+        tag: 'PT-702',
+        name: 'Standby Header Pressure',
+        unit: 'psi',
+        currentValue: 74.8,
+        normalRange: [68.0, 78.0],
+        warningRange: [60.0, 82.0],
+        criticalLimit: 55.0,
+        rateOfChange: 'Stable',
+        trustScore: 0.99,
+        status: 'normal',
+        lastUpdated: '10s ago'
+      },
+      {
+        id: 'sen-702-2',
+        tag: 'AMP-702',
+        name: 'Standby Motor Current',
+        unit: 'A',
+        currentValue: 0.0,
+        normalRange: [0.0, 135.0],
+        warningRange: [135.0, 150.0],
+        criticalLimit: 160.0,
+        rateOfChange: 'Ready for duty cycle',
+        trustScore: 0.99,
+        status: 'normal',
+        lastUpdated: '10s ago'
+      }
+    ]
+  },
+  {
+    id: 'SRT-201',
+    name: 'Parallel Cross-Belt Sorter 201',
+    code: 'FLM-SRT-S2',
+    siteId: 'fulfillment-3',
+    area: 'Induct & Sorting Hall',
+    line: 'Wave Sorter 2',
+    category: 'Sorter',
+    healthScore: 97,
+    healthStatus: 'optimal',
+    operatingHours: 6100,
+    criticality: 'A (High)',
+    owner: 'K. Novak',
+    limits: 'Max Mis-Sort: 0.005% · Speed: 2.8 m/s',
+    maintenanceSchedule: 'Biweekly optical inspection',
+    lastServiceDate: '2026-11-12',
+    sensors: [
+      {
+        id: 'sen-201-1',
+        tag: 'OPT-201',
+        name: 'Photo-Eye Clarity',
+        unit: '%',
+        currentValue: 98.4,
+        normalRange: [85.0, 100.0],
+        warningRange: [60.0, 85.0],
+        criticalLimit: 50.0,
+        rateOfChange: 'Optimal',
+        trustScore: 0.99,
+        status: 'normal',
+        lastUpdated: '5s ago'
+      },
+      {
+        id: 'sen-201-2',
+        tag: 'CAP-201',
+        name: 'Available Spare Induct Capacity',
+        unit: '%',
+        currentValue: 42.0,
+        normalRange: [20.0, 60.0],
+        warningRange: [10.0, 80.0],
+        criticalLimit: 95.0,
+        rateOfChange: 'Ready for wave reroute',
+        trustScore: 0.99,
+        status: 'normal',
+        lastUpdated: '5s ago'
+      }
+    ]
   }
 ];
 
