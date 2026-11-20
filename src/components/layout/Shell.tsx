@@ -1,13 +1,26 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
+import { useApp } from '../../context/AppContext';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { GuidedDemoModal } from './GuidedDemoModal';
 import { SearchModal } from '../common/SearchModal';
 import { ToastContainer } from '../common/ToastContainer';
 import { SafetyBanner } from '../common/SafetyBanner';
+import { SignInScreen } from '../auth/SignInScreen';
 
 export const Shell: React.FC = () => {
+  const { isAuthenticated } = useApp();
+
+  if (!isAuthenticated) {
+    return (
+      <>
+        <SignInScreen />
+        <ToastContainer />
+      </>
+    );
+  }
+
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-surface-bg text-navy-900">
       {/* Sidebar */}

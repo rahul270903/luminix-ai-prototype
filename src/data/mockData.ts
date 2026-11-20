@@ -1,4 +1,4 @@
-import { Asset, IndustrialEvent, SirachDecision, ApprovalRequest, OutcomeRecord, DataSourceItem } from '../types';
+import { Asset, IndustrialEvent, SirachDecision, ApprovalRequest, OutcomeRecord, DataSourceItem, UserProfile } from '../types';
 
 export const SITES = [
   { id: 'riverside', name: 'Riverside Plant', location: 'Columbus, OH', type: 'Continuous Processing', activeAssets: 14, health: 91 },
@@ -1130,3 +1130,67 @@ export const ROOT_CAUSE_TIMELINE_P104 = [
     status: 'decision'
   }
 ];
+
+export const PRESET_USERS: UserProfile[] = [
+  {
+    id: 'user-vance',
+    name: 'E. Vance',
+    initials: 'EV',
+    email: 'e.vance@riverside-industrial.com',
+    role: 'Executive / VP Operations',
+    title: 'VP of Plant Operations & Asset Reliability',
+    department: 'Corporate Manufacturing & Operational Excellence',
+    siteId: 'all',
+    siteName: 'All Industrial Facilities (Fleet)',
+    approvalLimit: '$50,000',
+    securityClearance: 'Level 4 (Executive Industrial Authority)',
+    seiretsuId: 'US-RIV-EXEC-01',
+    autonomyPolicy: 'approve'
+  },
+  {
+    id: 'user-patel',
+    name: 'J. Patel',
+    initials: 'JP',
+    email: 'j.patel@riverside-plant.com',
+    role: 'Lead Reliability Engineer',
+    title: 'Senior Vibration & Rotating Equipment Specialist',
+    department: 'Plant Maintenance & Reliability Engineering',
+    siteId: 'riverside',
+    siteName: 'Riverside Plant (Columbus, OH)',
+    approvalLimit: '$15,000',
+    securityClearance: 'Level 3 (OT Systems & CMMS Staging)',
+    seiretsuId: 'US-RIV-ENG-44',
+    autonomyPolicy: 'advise'
+  },
+  {
+    id: 'user-davis',
+    name: 'R. Davis',
+    initials: 'RD',
+    email: 'r.davis@austin-water.gov',
+    role: 'District Operations Lead',
+    title: 'Superintendent of Remote Pumping & Trunk Distribution',
+    department: 'Municipal Water Resources & Hydraulic Networks',
+    siteId: 'water-station-7',
+    siteName: 'Water Utility – Station 7 (Austin, TX)',
+    approvalLimit: '$25,000',
+    securityClearance: 'Level 3 (SCADA Setpoint Authority)',
+    seiretsuId: 'US-ATX-WTR-07',
+    autonomyPolicy: 'approve'
+  },
+  {
+    id: 'user-novak',
+    name: 'K. Novak',
+    initials: 'KN',
+    email: 'k.novak@logistics-site3.com',
+    role: 'Fulfillment Operations Manager',
+    title: 'Site 3 Sortation & Induct Hall Operations Lead',
+    department: 'Automated Logistics & Parcel Sortation',
+    siteId: 'fulfillment-3',
+    siteName: 'Fulfillment Center – Site 3 (Allentown, PA)',
+    approvalLimit: '$20,000',
+    securityClearance: 'Level 3 (PLC Line & Divert Authority)',
+    seiretsuId: 'US-ALN-LOG-03',
+    autonomyPolicy: 'advise'
+  }
+];
+

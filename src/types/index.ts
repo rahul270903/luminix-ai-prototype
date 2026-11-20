@@ -190,3 +190,20 @@ export interface SeiretsuApp {
   sampleResponse: Record<string, any>;
   color: string;
 }
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  initials: string;
+  email: string;
+  role: string;
+  title: string;
+  department: string;
+  siteId: SiteId;
+  siteName: string;
+  approvalLimit: string;
+  securityClearance: string;
+  seiretsuId: string;
+  autonomyPolicy: AutonomyLevel;
+}
+

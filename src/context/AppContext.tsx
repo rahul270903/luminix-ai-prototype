@@ -7,7 +7,8 @@ import {
   OutcomeRecord,
   DataSourceItem,
   Asset,
-  SirachDecision
+  SirachDecision,
+  UserProfile
 } from '../types';
 import {
   SITES,
@@ -16,7 +17,8 @@ import {
   APPROVAL_REQUESTS,
   OUTCOME_HISTORY,
   DATA_SOURCES,
-  SIRACH_DECISIONS
+  SIRACH_DECISIONS,
+  PRESET_USERS
 } from '../data/mockData';
 
 export type ScadaNetworkState = 'healthy' | 'latency' | 'packet-loss' | 'stale-data' | 'offline';
@@ -77,6 +79,14 @@ interface AppContextType {
   notifications: Array<{ id: string; title: string; time: string; type: 'info' | 'warning' | 'success'; read: boolean }>;
   markAllNotificationsRead: () => void;
 
+  // User Authentication & Session
+  currentUser: UserProfile | null;
+  isAuthenticated: boolean;
+  signIn: (params?: { userPresetId?: string; email?: string; password?: string }) => boolean;
+  signOut: () => void;
+  switchUser: (userPresetId: string) => void;
+  presetUsers: UserProfile[];
+
   // Toast
   toasts: ToastMessage[];
   showToast: (message: string, type?: 'info' | 'success' | 'warning' | 'error') => void;
@@ -108,6 +118,68 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Search
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  // User Authentication & Session
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(PRESET_USERS[0]);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
+
+  const signIn = (params?: { userPresetId?: string; email?: string; password?: string }): boolean => {
+    let userToLogin = PRESET_USERS[0];
+    if (params?.userPresetId) {
+      const found = PRESET_USERS.find(u => u.id === params.userPresetId);
+      if (found) userToLogin = found;
+    } else if (params?.email) {
+      const found = PRESET_USERS.find(u => u.email.toLowerCase() === params.email?.toLowerCase());
+      if (found) {
+        userToLogin = found;
+      } else {
+        const namePart = params.email.split('@')[0];
+        const initials = namePart.substring(0, 2).toUpperCase();
+        userToLogin = {
+          id: `custom-${Date.now()}`,
+          name: namePart.charAt(0).toUpperCase() + namePart.slice(1),
+          initials: initials || 'US',
+          email: params.email,
+          role: 'Plant Operations Specialist',
+          title: 'Authorized Industrial Context Operator',
+          department: 'Plant Operations & Engineering',
+          siteId: 'all',
+          siteName: 'All Sites (Global Access)',
+          approvalLimit: '$10,000',
+          securityClearance: 'Level 2 (OT Telemetry Access)',
+          seiretsuId: 'US-SEC-DEMO-99',
+          autonomyPolicy: 'advise'
+        };
+      }
+    }
+
+    setCurrentUser(userToLogin);
+    setIsAuthenticated(true);
+    if (userToLogin.siteId !== 'all') {
+      setSelectedSite(userToLogin.siteId);
+    }
+    setAutonomyLevel(userToLogin.autonomyPolicy);
+    showToast(`Welcome back, ${userToLogin.name} (${userToLogin.role})`, 'success');
+    return true;
+  };
+
+  const signOut = () => {
+    setIsAuthenticated(false);
+    showToast('Signed out of Luminix Enterprise Session', 'info');
+  };
+
+  const switchUser = (userPresetId: string) => {
+    const found = PRESET_USERS.find(u => u.id === userPresetId);
+    if (found) {
+      setCurrentUser(found);
+      setIsAuthenticated(true);
+      if (found.siteId !== 'all') {
+        setSelectedSite(found.siteId);
+      }
+      setAutonomyLevel(found.autonomyPolicy);
+      showToast(`Switched active operator to: ${found.name} (${found.role})`, 'info');
+    }
+  };
 
   // Toasts
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
@@ -373,6 +445,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setIsSearchOpen,
         notifications,
         markAllNotificationsRead,
+        currentUser,
+        isAuthenticated,
+        signIn,
+        signOut,
+        switchUser,
+        presetUsers: PRESET_USERS,
         toasts,
         showToast,
         dismissToast

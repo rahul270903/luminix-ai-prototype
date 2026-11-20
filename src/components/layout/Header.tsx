@@ -13,7 +13,9 @@ import {
   User,
   Shield,
   Check,
-  Radio
+  Radio,
+  LogOut,
+  Users
 } from 'lucide-react';
 import { SITES } from '../../data/mockData';
 
@@ -30,7 +32,11 @@ export const Header: React.FC = () => {
     markAllNotificationsRead,
     autonomyLevel,
     setAutonomyLevel,
-    showToast
+    showToast,
+    currentUser,
+    signOut,
+    switchUser,
+    presetUsers
   } = useApp();
 
   const [showNotifications, setShowNotifications] = useState(false);
@@ -313,27 +319,104 @@ export const Header: React.FC = () => {
             )}
           </div>
 
-          {/* User Profile */}
+          {/* User Profile & Sign Out Dropdown */}
           <div className="relative">
             <button
               onClick={() => setShowProfileMenu(!showProfileMenu)}
-              className="flex items-center gap-2 pl-2 border-l border-surface-border"
+              className="flex items-center gap-2 pl-2 border-l border-surface-border group"
+              title="View operator profile, switch persona, or sign out"
             >
-              <div className="w-8 h-8 rounded-full bg-navy-800 text-white flex items-center justify-center font-bold text-xs ring-2 ring-primary/20">
-                EV
+              <div className="w-8 h-8 rounded-full bg-navy-900 text-white flex items-center justify-center font-bold text-xs ring-2 ring-primary/30 group-hover:ring-primary transition">
+                {currentUser?.initials || 'EV'}
+              </div>
+              <div className="hidden xl:flex flex-col text-left">
+                <span className="text-xs font-bold text-navy-900 leading-tight flex items-center gap-1">
+                  <span>{currentUser?.name || 'E. Vance'}</span>
+                  <ChevronDown className="w-3 h-3 text-slate-400" />
+                </span>
+                <span className="text-[10px] text-slate-400 leading-tight">
+                  {currentUser?.role.split('/')[0] || 'Executive'}
+                </span>
               </div>
             </button>
 
             {showProfileMenu && (
-              <div className="absolute right-0 mt-1 w-56 bg-white rounded-lg shadow-xl border border-surface-border p-2 z-40 text-xs">
-                <div className="p-2 border-b border-surface-border">
-                  <div className="font-bold text-navy-900">E. Vance</div>
-                  <div className="text-slate-400">VP Plant Operations</div>
-                  <div className="text-[10px] font-mono text-primary mt-0.5">Approval Authority: $50,000</div>
+              <div className="absolute right-0 mt-1 w-72 bg-white rounded-xl shadow-2xl border border-surface-border p-2 z-40 text-xs animate-in fade-in zoom-in-95 duration-100">
+                {/* User Details Header */}
+                <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-100 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-navy-900 text-sm">{currentUser?.name}</span>
+                    <span className="text-[10px] font-mono bg-teal-50 text-teal-800 font-semibold px-1.5 py-0.5 rounded border border-teal-200">
+                      ACTIVE
+                    </span>
+                  </div>
+                  <div className="text-slate-600 font-medium text-xs">{currentUser?.title}</div>
+                  <div className="text-[11px] text-slate-400 font-mono truncate">{currentUser?.email}</div>
+                  <div className="pt-1.5 border-t border-slate-200/80 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+                    <span>Authority: <strong className="text-navy-900">{currentUser?.approvalLimit}</strong></span>
+                    <span>Facility: <strong className="text-primary">{currentUser?.siteId}</strong></span>
+                  </div>
                 </div>
-                <div className="pt-2 text-slate-500 space-y-1">
-                  <div className="px-2 py-1 text-slate-600">Enterprise Role: COO / VP Operations</div>
-                  <div className="px-2 py-1 text-slate-600">Seiretsu ID: US-RIV-EXEC-01</div>
+
+                {/* Operator Clearance & Role */}
+                <div className="p-2 text-[11px] text-slate-500 space-y-1 border-b border-surface-border">
+                  <div className="flex justify-between">
+                    <span>Clearance:</span>
+                    <span className="font-semibold text-navy-900">{currentUser?.securityClearance}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Seiretsu ID:</span>
+                    <span className="font-mono text-slate-600">{currentUser?.seiretsuId}</span>
+                  </div>
+                </div>
+
+                {/* Switch Persona Fast Menu */}
+                <div className="p-2 space-y-1.5 border-b border-surface-border">
+                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                    <Users className="w-3 h-3 text-primary" />
+                    <span>Switch Operator Persona</span>
+                  </div>
+                  <div className="space-y-1">
+                    {presetUsers.map(p => {
+                      const isCurrent = currentUser?.id === p.id;
+                      return (
+                        <button
+                          key={p.id}
+                          onClick={() => {
+                            switchUser(p.id);
+                            setShowProfileMenu(false);
+                          }}
+                          className={`w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-left text-xs transition ${
+                            isCurrent
+                              ? 'bg-primary/10 text-primary-dark font-bold'
+                              : 'text-slate-600 hover:bg-slate-50 hover:text-navy-900'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="w-5 h-5 rounded-md bg-slate-200 text-slate-700 flex items-center justify-center font-mono text-[10px] font-bold">
+                              {p.initials}
+                            </span>
+                            <span className="truncate">{p.name} ({p.role.split('/')[0]})</span>
+                          </div>
+                          {isCurrent && <Check className="w-3.5 h-3.5 text-primary" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Sign Out Action Button */}
+                <div className="p-1.5 pt-2">
+                  <button
+                    onClick={() => {
+                      setShowProfileMenu(false);
+                      signOut();
+                    }}
+                    className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-bold text-rose-600 hover:bg-rose-50 border border-rose-200/60 transition"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span>Sign Out of Session</span>
+                  </button>
                 </div>
               </div>
             )}

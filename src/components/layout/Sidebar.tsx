@@ -21,7 +21,8 @@ import {
   Layers,
   ChevronLeft,
   ChevronRight,
-  SunMedium
+  SunMedium,
+  LogOut
 } from 'lucide-react';
 
 interface NavItem {
@@ -41,7 +42,7 @@ interface NavSection {
 
 export const Sidebar: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
-  const { approvalRequests, events, scadaNetworkCondition } = useApp();
+  const { approvalRequests, events, scadaNetworkCondition, currentUser, signOut } = useApp();
 
   const pendingApprovalsCount = approvalRequests.filter(r => r.status === 'pending').length;
   const activeEventsCount = events.filter(e => e.status === 'active').length;
@@ -182,21 +183,54 @@ export const Sidebar: React.FC = () => {
         ))}
       </div>
 
-      {/* Footer Profile & Ecosystem Notice */}
-      <div className="p-3 border-t border-navy-800 bg-navy-950/60 text-xs">
+      {/* Footer Operator Profile & Sign Out Action */}
+      <div className="p-3 border-t border-navy-800 bg-navy-950/70 text-xs">
         {!collapsed ? (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] text-slate-400">Ecosystem</span>
-              <span className="font-mono text-[10px] text-teal font-semibold">Seiretsu Ai</span>
+          <div className="space-y-2.5">
+            {/* Operator Card */}
+            <div className="flex items-center justify-between p-2 rounded-lg bg-navy-900/80 border border-navy-800/80">
+              <div className="flex items-center gap-2 overflow-hidden">
+                <div className="w-7 h-7 rounded-md bg-primary text-white flex items-center justify-center font-bold text-[11px] shrink-0 ring-1 ring-primary/40">
+                  {currentUser?.initials || 'EV'}
+                </div>
+                <div className="overflow-hidden">
+                  <div className="font-bold text-white text-[11px] truncate leading-tight">
+                    {currentUser?.name || 'E. Vance'}
+                  </div>
+                  <div className="text-[10px] text-slate-400 truncate leading-tight">
+                    {currentUser?.role.split('/')[0] || 'Executive'}
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={signOut}
+                title="Sign out of Luminix"
+                className="p-1.5 rounded-md text-slate-400 hover:text-rose-400 hover:bg-navy-800 transition shrink-0"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+              </button>
             </div>
-            <div className="text-[10px] text-slate-400 font-mono flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span>LUMINIX v1.0 · DEMO</span>
+
+            <div className="flex items-center justify-between text-[10px] text-slate-400 font-mono px-1">
+              <span className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>LUMINIX v1.0</span>
+              </span>
+              <span className="text-teal font-semibold">Seiretsu Ai</span>
             </div>
           </div>
         ) : (
-          <div className="w-2 h-2 rounded-full bg-emerald-500 mx-auto" title="Luminix Active" />
+          <div className="flex flex-col items-center gap-2">
+            <button
+              onClick={signOut}
+              title={`Signed in as ${currentUser?.name}. Click to sign out.`}
+              className="w-7 h-7 rounded-md bg-navy-800 hover:bg-rose-500/20 text-slate-300 hover:text-rose-400 flex items-center justify-center text-[10px] font-bold font-mono transition"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+            </button>
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" title="Luminix Active" />
+          </div>
         )}
       </div>
     </aside>
