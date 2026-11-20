@@ -1,3 +1,4 @@
+// Luminix Ai Application State Context
 import React, { createContext, useContext, useState } from 'react';
 import {
   SiteId,

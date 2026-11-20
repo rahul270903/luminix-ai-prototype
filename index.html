@@ -11,6 +11,17 @@
   </head>
   <body class="bg-surface-bg text-navy-900 antialiased font-sans">
     <div id="root"></div>
+    <script>
+      // Automatically dismiss any stale or lingering Vite error overlays
+      const clearViteOverlays = () => {
+        document.querySelectorAll('vite-error-overlay').forEach(el => el.remove());
+      };
+      window.addEventListener('DOMContentLoaded', clearViteOverlays);
+      window.addEventListener('load', clearViteOverlays);
+      // Periodic check on initial mount
+      setTimeout(clearViteOverlays, 300);
+      setTimeout(clearViteOverlays, 1000);
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
